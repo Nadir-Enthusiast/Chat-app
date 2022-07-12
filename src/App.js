@@ -6,6 +6,7 @@ import { collection, query, orderBy, limit, addDoc, serverTimestamp, deleteDoc, 
 import {useCollectionData} from "react-firebase-hooks/firestore"
 import { useRef, useState } from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 
 function App() {
 
@@ -34,7 +35,8 @@ function ChatRoom() {
       text: formValue,
       createdAt: serverTimestamp(),
       uid: uid,
-      photoURL: photoURL
+      photoURL: photoURL,
+      name: null
     })
       .then(docRef => {updateDoc(docRef, {id: docRef.id})})
       .catch(err => console.error(err))
@@ -91,12 +93,18 @@ function ChatMessage(msg) {
   const text = msg.message.text;
   const uid = msg.message.uid;
   const id = msg.message.id;
+  const pic = msg.message.photoURL;
+  const username = msg.message.name;
 
   const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
   return(
     <div className={`message ${messageClass}`}>
+      {pic != null ? (<img src={`${pic}`} alt='' />) : <AccountCircleOutlinedIcon className='avatar' />}
+      <div className='content'>
+        <h5>{username != null ? `${username}` : 'Guest'}</h5>
+        <p>{text}</p>
+      </div>
       {uid === auth.currentUser.uid ? <button onClick={() => deleteDoc(doc(firestore, 'messages', `${id}`))}><DeleteIcon /></button>: ''}
-      <p>{text}</p>
     </div>
   )
 }
